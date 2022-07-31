@@ -9,15 +9,19 @@ import (
 	"os"
 	"strconv"
 	"strings"
-
-	"github.com/ramrodo/stori-technical-challenge/model"
 )
 
-func mapCSV() ([]model.Transaction, error) {
+type Transaction struct {
+	Id          string `json:"Id"`
+	Date        string `json:"Date"`
+	Transaction string `json:"Transaction"`
+}
+
+func mapCSV() ([]Transaction, error) {
 	csvFile, err := os.Open("txns.csv")
 
 	if err != nil {
-		return []model.Transaction{}, err
+		return []Transaction{}, err
 	}
 
 	defer csvFile.Close()
@@ -27,17 +31,17 @@ func mapCSV() ([]model.Transaction, error) {
 	data, err := reader.ReadAll()
 
 	if err != nil {
-		return []model.Transaction{}, err
+		return []Transaction{}, err
 	}
 
-	transactions := []model.Transaction{}
+	transactions := []Transaction{}
 
 	for i, row := range data {
 		if i == 0 {
 			continue
 		}
 
-		transactions = append(transactions, model.Transaction{
+		transactions = append(transactions, Transaction{
 			Id:          row[0],
 			Date:        row[1],
 			Transaction: row[2],
@@ -47,7 +51,7 @@ func mapCSV() ([]model.Transaction, error) {
 	return transactions, nil
 }
 
-func calculateBalance(transactions []model.Transaction) (float64, error) {
+func calculateBalance(transactions []Transaction) (float64, error) {
 
 	totalBalance := 0.0
 
@@ -64,7 +68,7 @@ func calculateBalance(transactions []model.Transaction) (float64, error) {
 	return totalBalance, nil
 }
 
-func calculateTransactionsPerMonth(transactions []model.Transaction) (map[string]int, error) {
+func calculateTransactionsPerMonth(transactions []Transaction) (map[string]int, error) {
 
 	transactionsPerMonth := make(map[string]int)
 
@@ -76,7 +80,7 @@ func calculateTransactionsPerMonth(transactions []model.Transaction) (map[string
 	return transactionsPerMonth, nil
 }
 
-func calculateAverageDebit(transactions []model.Transaction) ([]float64, error) {
+func calculateAverageDebit(transactions []Transaction) ([]float64, error) {
 
 	creditAmounts := []float64{}
 	debitAmounts := []float64{}
@@ -167,3 +171,7 @@ func main() {
 
 	makeEmail(totalBalance, transactionsPerMonth, averages)
 }
+
+// TODO: Only one for cycle to do all the calculations
+// TODO: Concurrencia al leer el archivo
+// TODO: Concurrencia al procesar los datos
