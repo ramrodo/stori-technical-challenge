@@ -80,7 +80,7 @@ func calculateTransactionsPerMonth(transactions []Transaction) (map[string]int, 
 	return transactionsPerMonth, nil
 }
 
-func calculateAverageDebit(transactions []Transaction) ([]float64, error) {
+func calculateAverages(transactions []Transaction) ([]float64, error) {
 
 	creditAmounts := []float64{}
 	debitAmounts := []float64{}
@@ -163,7 +163,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	averages, err := calculateAverageDebit(transactions)
+	averages, err := calculateAverages(transactions)
 
 	if err != nil {
 		log.Fatalln(err)
@@ -171,7 +171,3 @@ func main() {
 
 	makeEmail(totalBalance, transactionsPerMonth, averages)
 }
-
-// TODO: Only one for cycle to do all the calculations
-// TODO: Concurrencia al leer el archivo
-// TODO: Concurrencia al procesar los datos
