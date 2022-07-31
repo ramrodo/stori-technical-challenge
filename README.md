@@ -33,3 +33,23 @@ Your project must meet these requirements:
 3. Package and run code on a cloud platform like AWS. Use AWS Lambda and S3 in lieu of Docker
 
 ## How to execute it
+
+### Local
+
+```bash
+go run main.go
+```
+
+### Docker
+
+1. Build image
+
+```bash
+docker build --tag stori-go-app
+```
+
+2. Run image
+
+```bash
+docker run stori-go-app
+```

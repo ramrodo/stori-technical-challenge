@@ -23,6 +23,3 @@ COPY --from=build /stori-app /stori-app
 COPY txns.csv ./
 
 ENTRYPOINT [ "/stori-app" ]
-
-## docker build --tag stori-go-app .
-## docker run stori-go-app
