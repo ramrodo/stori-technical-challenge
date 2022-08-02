@@ -135,7 +135,7 @@ func makeEmail(totalBalance float64, trs map[string]int, averages []float64) {
 	// Email summary
 	fmt.Println("Total balance is:", math.Round(totalBalance*100)/100)
 	for month, trs := range trs {
-		fmt.Printf("Number of models.Transactions in %s: %d \n", months[month], trs)
+		fmt.Printf("Number of transactions in %s: %d\n", months[month], trs)
 	}
 	fmt.Println("Average debit amount:", averages[1])
 	fmt.Println("Average credit amount:", averages[0])
