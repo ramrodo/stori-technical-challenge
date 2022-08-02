@@ -36,6 +36,23 @@ docker compose up mongodb mongo-express
 docker compose up go-app
 ```
 
+Expected output:
+
+```bash
+...
+Attaching to go-app
+go-app  | Transaction added: &{ObjectID("62e96aa00ba6ff6fdeafb015")}
+go-app  | Transaction added: &{ObjectID("62e96aa00ba6ff6fdeafb016")}
+go-app  | Transaction added: &{ObjectID("62e96aa00ba6ff6fdeafb017")}
+go-app  | Transaction added: &{ObjectID("62e96aa00ba6ff6fdeafb018")}
+go-app  | Total balance is: 39.74
+go-app  | Number of transactions in July: 2
+go-app  | Number of transactions in August: 2
+go-app  | Average debit amount: -15.38
+go-app  | Average credit amount: 35.25
+go-app exited with code 0
+```
+
 #### To stop and remove Docker stuff created
 
 1. Remove containers
