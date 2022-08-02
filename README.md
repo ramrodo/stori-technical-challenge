@@ -16,8 +16,8 @@ This project has a [docker-compose.yml](docker-compose.yml) that creates 3 conta
 2. **mongo-express:** a lightweight web-based administrative interface deployed to manage MongoDB databases interactively at `http://localhost:8081`
 3. **go-app:** a Go app that:
     - reads the transactions in the [txns.csv](txns.csv) file
-    - insert theses transactions into the MongoDB container
-    - process and make the calculations specified at [Challenge.md](Challenge.md) and makes a summary of this information
+    - inserts theses transactions into the MongoDB container
+    - processes and makes the calculations specified at [Challenge.md](Challenge.md) and outputs a summary of this information
 
 ## How to execute it
 
