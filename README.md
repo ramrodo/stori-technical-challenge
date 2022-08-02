@@ -10,12 +10,6 @@ See [Instructions of the challenge](Challenge.md)
 
 ## How to execute it
 
-### Local
-
-```bash
-go run main.go
-```
-
 ### Docker
 
 1. Build containers
