@@ -8,6 +8,17 @@ See [Instructions of the challenge](Challenge.md)
 - Docker
 - `docker compose` (v2)
 
+## About this project
+
+This project has a [docker-compose.yml](docker-compose.yml) that creates 3 containers:
+
+1. **mongodb:** MongoDB instance running and initialize a database and a collection with the values at `.env` file
+2. **mongo-express:** a lightweight web-based administrative interface deployed to manage MongoDB databases interactively at `http://localhost:8081`
+3. **go-app:** a Go app that:
+    - reads the transactions in the [txns.csv](txns.csv) file
+    - insert theses transactions into the MongoDB container
+    - process and make the calculations specified at [Challenge.md](Challenge.md) and makes a summary of this information
+
 ## How to execute it
 
 ### Docker
