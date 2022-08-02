@@ -2,7 +2,9 @@ package models
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"os"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -14,7 +16,12 @@ type MongoDB struct {
 }
 
 func (db MongoDB) ConnectDB() MongoDB {
-	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI("mongodb+srv://ramrodo:wUSE9ID3cERGrJNS@clusterdb.6dulmuc.mongodb.net/?retryWrites=true&w=majority"))
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
+
+	uri := fmt.Sprintf("mongodb://%s:%s@mongodb:27017", dbUser, dbPassword)
+	clientOptions := options.Client().ApplyURI(uri)
+	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
 		log.Fatal(err)
 	}

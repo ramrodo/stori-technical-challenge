@@ -141,19 +141,16 @@ func makeEmail(totalBalance float64, trs map[string]int, averages []float64) {
 	fmt.Println("Average credit amount:", averages[0])
 }
 
-func insertSampleTransaction() {
-	singleTransaction := models.Transaction{
-		Id:          "4",
-		Date:        "9/1",
-		Transaction: "+50",
+func insertTransactions(trs []models.Transaction) error {
+	for _, tr := range trs {
+		transactionObjectId, err := db.InsertTransaction(tr)
+		if err != nil {
+			return err
+		}
+		fmt.Println("Transaction added:", transactionObjectId)
 	}
 
-	transactionObjectId, err := db.InsertTransaction(singleTransaction)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	fmt.Println("transactionObjectId:", transactionObjectId)
+	return nil
 }
 
 func main() {
@@ -162,16 +159,20 @@ func main() {
 	db = mongoDB.ConnectDB()
 	defer db.CloseDB()
 
-	trs, err := db.GetAllTransactions()
+	// Get transactions from CSV file and insert into MongoDB
+	trsCSV, err := mapCSV()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = insertTransactions(trsCSV)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	// Get transactions from CSV file (instead of using MongoDB)
-	// trs, err := mapCSV()
-	// if err != nil {
-	// 	log.Fatalln(err)
-	// }
+	trs, err := db.GetAllTransactions()
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	totalBalance, err := calculateBalance(trs)
 	if err != nil {
