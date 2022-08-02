@@ -8,18 +8,20 @@ ENV GO111MODULE=on
 WORKDIR /app
 
 COPY go.mod ./
+COPY go.sum ./
 RUN go mod download
 
 COPY main.go ./
-RUN go build -o /stori-app
+COPY models/ models/
+RUN go build -o . ./...
 
 ## Deploy
 
-FROM scratch
+FROM alpine
 
 WORKDIR /
 
-COPY --from=build /stori-app /stori-app
+COPY --from=build /app/stori-technical-challenge ./stori-technical-challenge
 COPY txns.csv ./
 
-ENTRYPOINT [ "/stori-app" ]
+ENTRYPOINT [ "./stori-technical-challenge" ]

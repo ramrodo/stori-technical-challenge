@@ -9,19 +9,17 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/ramrodo/stori-technical-challenge/models"
 )
 
-type Transaction struct {
-	Id          string `json:"Id"`
-	Date        string `json:"Date"`
-	Transaction string `json:"Transaction"`
-}
+var db models.MongoDB
 
-func mapCSV() ([]Transaction, error) {
+func mapCSV() ([]models.Transaction, error) {
 	csvFile, err := os.Open("txns.csv")
 
 	if err != nil {
-		return []Transaction{}, err
+		return []models.Transaction{}, err
 	}
 
 	defer csvFile.Close()
@@ -31,31 +29,31 @@ func mapCSV() ([]Transaction, error) {
 	data, err := reader.ReadAll()
 
 	if err != nil {
-		return []Transaction{}, err
+		return []models.Transaction{}, err
 	}
 
-	transactions := []Transaction{}
+	trs := []models.Transaction{}
 
 	for i, row := range data {
 		if i == 0 {
 			continue
 		}
 
-		transactions = append(transactions, Transaction{
+		trs = append(trs, models.Transaction{
 			Id:          row[0],
 			Date:        row[1],
 			Transaction: row[2],
 		})
 	}
 
-	return transactions, nil
+	return trs, nil
 }
 
-func calculateBalance(transactions []Transaction) (float64, error) {
+func calculateBalance(trs []models.Transaction) (float64, error) {
 
 	totalBalance := 0.0
 
-	for _, t := range transactions {
+	for _, t := range trs {
 		number, err := strconv.ParseFloat(t.Transaction, 64)
 
 		if err != nil {
@@ -68,11 +66,11 @@ func calculateBalance(transactions []Transaction) (float64, error) {
 	return totalBalance, nil
 }
 
-func calculateTransactionsPerMonth(transactions []Transaction) (map[string]int, error) {
+func calculateTransactionsPerMonth(trs []models.Transaction) (map[string]int, error) {
 
 	transactionsPerMonth := make(map[string]int)
 
-	for _, t := range transactions {
+	for _, t := range trs {
 		month := strings.Split(t.Date, "/")[0]
 		transactionsPerMonth[month] += 1
 	}
@@ -80,12 +78,12 @@ func calculateTransactionsPerMonth(transactions []Transaction) (map[string]int, 
 	return transactionsPerMonth, nil
 }
 
-func calculateAverages(transactions []Transaction) ([]float64, error) {
+func calculateAverages(trs []models.Transaction) ([]float64, error) {
 
 	creditAmounts := []float64{}
 	debitAmounts := []float64{}
 
-	for _, t := range transactions {
+	for _, t := range trs {
 		number, err := strconv.ParseFloat(t.Transaction, 64)
 
 		if err != nil {
@@ -118,7 +116,7 @@ func calculateAverages(transactions []Transaction) ([]float64, error) {
 	return average, nil
 }
 
-func makeEmail(totalBalance float64, transactionsPerMonth map[string]int, averages []float64) {
+func makeEmail(totalBalance float64, trs map[string]int, averages []float64) {
 	months := map[string]string{
 		"1":  "January",
 		"2":  "February",
@@ -136,38 +134,59 @@ func makeEmail(totalBalance float64, transactionsPerMonth map[string]int, averag
 
 	// Email summary
 	fmt.Println("Total balance is:", math.Round(totalBalance*100)/100)
-	for month, trs := range transactionsPerMonth {
-		fmt.Printf("Number of transactions in %s: %d \n", months[month], trs)
+	for month, trs := range trs {
+		fmt.Printf("Number of models.Transactions in %s: %d \n", months[month], trs)
 	}
 	fmt.Println("Average debit amount:", averages[1])
 	fmt.Println("Average credit amount:", averages[0])
 }
 
+func insertSampleTransaction() {
+	singleTransaction := models.Transaction{
+		Id:          "4",
+		Date:        "9/1",
+		Transaction: "+50",
+	}
+
+	transactionObjectId, err := db.InsertTransaction(singleTransaction)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	fmt.Println("transactionObjectId:", transactionObjectId)
+}
+
 func main() {
 
-	transactions, err := mapCSV()
+	var mongoDB models.MongoDB
+	db = mongoDB.ConnectDB()
+	defer db.CloseDB()
 
+	trs, err := db.GetAllTransactions()
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	totalBalance, err := calculateBalance(transactions)
+	// Get transactions from CSV file (instead of using MongoDB)
+	// trs, err := mapCSV()
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
 
+	totalBalance, err := calculateBalance(trs)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	transactionsPerMonth, err := calculateTransactionsPerMonth(transactions)
-
+	trsPerMonth, err := calculateTransactionsPerMonth(trs)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	averages, err := calculateAverages(transactions)
-
+	averages, err := calculateAverages(trs)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	makeEmail(totalBalance, transactionsPerMonth, averages)
+	makeEmail(totalBalance, trsPerMonth, averages)
 }
