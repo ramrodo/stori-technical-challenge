@@ -5,8 +5,11 @@ import (
 	"encoding/csv"
 	"fmt"
 	"html/template"
+	"io"
+	"io/ioutil"
 	"log"
 	"math"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -28,9 +31,47 @@ type templateData struct {
 	AverageCredit        float64
 }
 
-func mapCSV() ([]models.Transaction, error) {
-	csvFile, err := os.Open("txns.csv")
+func downloadFile(filepath string, url string) error {
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
 
+	out, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, resp.Body)
+	return err
+}
+
+func mapCSV() ([]models.Transaction, error) {
+	csvLocation := os.Getenv("CSV_LOCATION")
+	filename := "txns.csv"
+
+	if csvLocation != filename {
+		err := downloadFile("/template/txns.csv", csvLocation)
+
+		if err != nil {
+			return []models.Transaction{}, err
+		}
+
+		files, err := ioutil.ReadDir("/template")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		for _, f := range files {
+			fmt.Println(f.Name())
+		}
+
+		filename = "/template/txns.csv"
+	}
+
+	csvFile, err := os.Open(filename)
 	if err != nil {
 		return []models.Transaction{}, err
 	}
@@ -199,8 +240,7 @@ func insertTransactions(trs []models.Transaction) error {
 	return nil
 }
 
-func main() {
-
+func executeProcess() {
 	var mongoDB models.MongoDB
 	db = mongoDB.ConnectDB()
 	defer db.CloseDB()
@@ -236,4 +276,8 @@ func main() {
 	}
 
 	makeEmail(totalBalance, trsPerMonth, averages)
+}
+
+func main() {
+	executeProcess()
 }
