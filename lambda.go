@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"encoding/csv"
 	"fmt"
 	"html/template"
@@ -13,8 +14,13 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/ramrodo/stori-technical-challenge/models"
 )
+
+type MyEvent struct {
+	Name string `json:"name"`
+}
 
 var db models.MongoDB
 
@@ -271,6 +277,11 @@ func executeProcess() {
 	makeEmail(totalBalance, trsPerMonth, averages)
 }
 
-func main() {
+func HandleRequest(ctx context.Context, name MyEvent) (bool, error) {
 	executeProcess()
+	return true, nil
+}
+
+func main() {
+	lambda.Start(HandleRequest)
 }

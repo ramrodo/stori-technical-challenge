@@ -2,7 +2,10 @@ module github.com/ramrodo/stori-technical-challenge
 
 go 1.18
 
-require go.mongodb.org/mongo-driver v1.10.0
+require (
+	github.com/aws/aws-lambda-go v1.34.1
+	go.mongodb.org/mongo-driver v1.10.0
+)
 
 require (
 	github.com/golang/snappy v0.0.1 // indirect

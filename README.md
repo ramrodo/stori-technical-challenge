@@ -74,3 +74,18 @@ docker compose down
 docker volume ls
 docker volume rm <volume-name>
 ```
+
+## How to upload to AWS Lambda
+
+1. Build the code for lambda
+
+```bash
+make build
+```
+
+2. Upload `bin/main.zip` to AWS Lambda
+
+The `txns.csv` and `email-template.html` are stored as public at AWS S3:
+
+- [https://s3.amazonaws.com/rodomar.mx/assets/files/txns.csv](https://s3.amazonaws.com/rodomar.mx/assets/files/txns.csv)
+- [https://s3.amazonaws.com/rodomar.mx/assets/files/email-template.html](https://s3.amazonaws.com/rodomar.mx/assets/files/email-template.html)
