@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <h1>Your balance</h1>
+    <h2>Summary</h1>
+    <ul>
+        <li>Total balance is: <b>{{.TotalBalance}}</b></li>
+        {{range .TransactionsPerMonth -}}
+        <li>Number of transactions in <b>{{.Month}}</b>: <b>{{.Number}}</b></li>
+        {{- end}}
+        <li>Average debit amount: <b>{{.AverageDebit}}</b></li>
+        <li>Average credit amount: <b>{{.AverageCredit}}</b></li>
+    </ul>
+    <img src="stori-logo.png" />
+</body>
+
+</html>

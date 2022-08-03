@@ -23,5 +23,6 @@ WORKDIR /
 
 COPY --from=build /app/stori-technical-challenge ./stori-technical-challenge
 COPY txns.csv ./
+COPY email-template.html ./
 
 ENTRYPOINT [ "./stori-technical-challenge" ]

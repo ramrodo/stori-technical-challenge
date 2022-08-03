@@ -17,7 +17,8 @@ This project has a [docker-compose.yml](docker-compose.yml) that creates 3 conta
 3. **go-app:** a Go app that:
     - reads the transactions in the [txns.csv](txns.csv) file
     - inserts theses transactions into the MongoDB container
-    - processes and makes the calculations specified at [Challenge.md](Challenge.md) and outputs a summary of this information
+    - processes and makes the calculations specified at [Challenge.md](Challenge.md) and outputs a summary information
+    - creates `email.html` containing the summary information
 
 ## How to execute it
 
@@ -55,6 +56,7 @@ go-app  | Number of transactions in July: 2
 go-app  | Number of transactions in August: 2
 go-app  | Average debit amount: -15.38
 go-app  | Average credit amount: 35.25
+go-app  | Email template created: /template/email.html
 go-app exited with code 0
 ```
 

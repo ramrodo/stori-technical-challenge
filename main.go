@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/csv"
 	"fmt"
+	"html/template"
 	"log"
 	"math"
 	"os"
@@ -14,6 +15,18 @@ import (
 )
 
 var db models.MongoDB
+
+type transactionPerMonth struct {
+	Month  string
+	Number int
+}
+
+type templateData struct {
+	TotalBalance         float64
+	TransactionsPerMonth []transactionPerMonth
+	AverageDebit         float64
+	AverageCredit        float64
+}
 
 func mapCSV() ([]models.Transaction, error) {
 	csvFile, err := os.Open("txns.csv")
@@ -116,7 +129,7 @@ func calculateAverages(trs []models.Transaction) ([]float64, error) {
 	return average, nil
 }
 
-func makeEmail(totalBalance float64, trs map[string]int, averages []float64) {
+func makeEmail(balance float64, trs map[string]int, averages []float64) {
 	months := map[string]string{
 		"1":  "January",
 		"2":  "February",
@@ -133,12 +146,45 @@ func makeEmail(totalBalance float64, trs map[string]int, averages []float64) {
 	}
 
 	// Email summary
-	fmt.Println("Total balance is:", math.Round(totalBalance*100)/100)
+	totalBalance := math.Round(balance*100) / 100
+	averageDebit := math.Round(averages[1]*100) / 100
+	averageCredit := math.Round(averages[0]*100) / 100
+
+	fmt.Println("Total balance is:", totalBalance)
 	for month, trs := range trs {
 		fmt.Printf("Number of transactions in %s: %d\n", months[month], trs)
 	}
-	fmt.Println("Average debit amount:", averages[1])
-	fmt.Println("Average credit amount:", averages[0])
+	fmt.Println("Average debit amount:", averageDebit)
+	fmt.Println("Average credit amount:", averageCredit)
+
+	tmpData := templateData{}
+	tmpData.TotalBalance = totalBalance
+	tmpData.AverageDebit = averageDebit
+	tmpData.AverageCredit = averageCredit
+
+	for month, trs := range trs {
+		tr := transactionPerMonth{
+			Month:  months[month],
+			Number: trs,
+		}
+		tmpData.TransactionsPerMonth = append(tmpData.TransactionsPerMonth, tr)
+	}
+
+	t := template.Must(template.ParseFiles("email-template.html"))
+
+	f, err := os.Create("/template/email.html")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	err = t.Execute(f, tmpData)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Email template created:", f.Name())
 }
 
 func insertTransactions(trs []models.Transaction) error {
