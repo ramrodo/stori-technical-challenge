@@ -2,7 +2,6 @@ package models
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 
@@ -16,10 +15,7 @@ type MongoDB struct {
 }
 
 func (db MongoDB) ConnectDB() MongoDB {
-	dbUser := os.Getenv("DB_USER")
-	dbPassword := os.Getenv("DB_PASSWORD")
-
-	uri := fmt.Sprintf("mongodb://%s:%s@mongodb:27017", dbUser, dbPassword)
+	uri := os.Getenv("MONGODB_URL")
 	clientOptions := options.Client().ApplyURI(uri)
 	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
